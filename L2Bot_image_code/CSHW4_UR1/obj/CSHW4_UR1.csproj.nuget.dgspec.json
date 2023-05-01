@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\aturner2\\Desktop\\UR1\\L2Bot_Final_Programs\\L2Bot_image_code\\CSHW4_UR1\\CSHW4_UR1.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\aturner2\\Desktop\\UR1\\L2Bot_Final_Programs\\L2Bot_image_code\\CSHW4_UR1\\CSHW4_UR1.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\aturner2\\Desktop\\UR1\\L2Bot_Final_Programs\\L2Bot_image_code\\CSHW4_UR1\\CSHW4_UR1.csproj",
+        "projectName": "CSHW4_UR1",
+        "projectPath": "C:\\Users\\aturner2\\Desktop\\UR1\\L2Bot_Final_Programs\\L2Bot_image_code\\CSHW4_UR1\\CSHW4_UR1.csproj",
+        "packagesPath": "C:\\Users\\aturner2\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\aturner2\\Desktop\\UR1\\L2Bot_Final_Programs\\L2Bot_image_code\\CSHW4_UR1\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\aturner2\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "dependencies": {
+            "Emgu.CV": {
+              "target": "Package",
+              "version": "[4.6.0.5131, )"
+            },
+            "Emgu.CV.Bitmap": {
+              "target": "Package",
+              "version": "[4.6.0.5131, )"
+            },
+            "Emgu.CV.runtime.windows": {
+              "target": "Package",
+              "version": "[4.6.0.5131, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}
