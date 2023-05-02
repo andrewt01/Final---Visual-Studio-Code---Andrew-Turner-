@@ -13,7 +13,7 @@ using Emgu.CV.Structure;
 
 //make some functions to handle certain things so that the display webcam section is not overrun by many many lines 
 
-//final project
+//final project, named this as I copied my cs hw4 file since it was a good start from that 
 namespace CSHW4_UR1
 {
     public partial class Form1 : Form
@@ -39,6 +39,7 @@ namespace CSHW4_UR1
         int hueMaxRed = 179;
         int satMaxRed, valMaxRed = 255;
 
+        //bool value for start and stop button later 
         bool start = false;
 
         public Form1()
@@ -52,9 +53,10 @@ namespace CSHW4_UR1
             _captureThread = new Thread(DisplayWebcam);
             _captureThread.Start();
 
-            robot = new robot("COM20"); //serial com port  
+            robot = new robot("COM5"); //serial com port  
         }
 
+        //resize the picturebox function 
         private void resizePictureBox(Mat originalFrame)
         {
             int newHeight = (originalFrame.Size.Height * originalPictureBox.Width) / originalFrame.Size.Width;
@@ -73,15 +75,6 @@ namespace CSHW4_UR1
 
             hsvPictureBoxMerged.Image = mergedImage.ToBitmap();
         }
-
-        //private void resizeFinal_RedImage(Mat mergedImage2)
-        //{
-        //    int hsvRed_newHeight = (mergedImage2.Size.Height * hsvMergedPictureBoxRed.Width) / mergedImage2.Size.Width;
-        //    Size hsvRed_newSize = new Size(hsvMergedPictureBoxRed.Size.Width, hsvRed_newHeight);
-        //    CvInvoke.Resize(mergedImage2, mergedImage2, hsvRed_newSize);
-
-        //    hsvMergedPictureBoxRed.Image = mergedImage2.ToBitmap();
-        //}
 
         //change value in the display webcame to 1 for the external camera 
         //need two separate hue, sat, value -- one to read the yellow and the other to read the red line 
@@ -126,89 +119,97 @@ namespace CSHW4_UR1
 
                 
                 //HSV Threshold 1 -- yellow line 
-                Mat hsvFrame = new Mat();
-                CvInvoke.CvtColor(originalFrame, hsvFrame, Emgu.CV.CvEnum.ColorConversion.Bgr2Hsv);
-                Mat[] hsvChannels = hsvFrame.Split();
+                Mat hsvFrameYellow = new Mat();
+                CvInvoke.CvtColor(originalFrame, hsvFrameYellow, Emgu.CV.CvEnum.ColorConversion.Bgr2Hsv);
+                Mat[] hsvChannels = hsvFrameYellow.Split();
 
                 //hue part
-                Mat hueFilter = new Mat();
-                CvInvoke.InRange(hsvChannels[0], new ScalarArray(hueMin), new ScalarArray(hueMax), hueFilter);
-                Invoke(new Action(() => { huePictureBox.Image = hueFilter.ToBitmap(); }));
+                Mat hueFilterYellow = new Mat();
+                CvInvoke.InRange(hsvChannels[0], new ScalarArray(hueMin), new ScalarArray(hueMax), hueFilterYellow);
+                Invoke(new Action(() => { huePictureBox.Image = hueFilterYellow.ToBitmap(); }));
 
                 //saturation part
-                Mat saturationFilter = new Mat();
-                CvInvoke.InRange(hsvChannels[1], new ScalarArray(saturationMin), new ScalarArray(saturationMax), saturationFilter);
-                Invoke(new Action(() => { saturationPictureBox.Image = saturationFilter.ToBitmap(); }));
+                Mat saturationFilterYellow = new Mat();
+                CvInvoke.InRange(hsvChannels[1], new ScalarArray(saturationMin), new ScalarArray(saturationMax), saturationFilterYellow);
+                Invoke(new Action(() => { saturationPictureBox.Image = saturationFilterYellow.ToBitmap(); }));
 
                 //value part
-                Mat valueFilter = new Mat();
-                CvInvoke.InRange(hsvChannels[2], new ScalarArray(valueMin), new ScalarArray(valueMax), valueFilter);
-                Invoke(new Action(() => { valuePictureBox.Image = valueFilter.ToBitmap(); }));
+                Mat valueFilterYellow = new Mat();
+                CvInvoke.InRange(hsvChannels[2], new ScalarArray(valueMin), new ScalarArray(valueMax), valueFilterYellow);
+                Invoke(new Action(() => { valuePictureBox.Image = valueFilterYellow.ToBitmap(); }));
 
-                Mat mergedImage = new Mat();
-                CvInvoke.BitwiseAnd(hueFilter, saturationFilter, mergedImage);
-                CvInvoke.BitwiseAnd(mergedImage, valueFilter, mergedImage);
-                Invoke(new Action(() => { hsvPictureBoxMerged.Image = mergedImage.ToBitmap(); }));
+                Mat mergedImageYellow = new Mat();
+                CvInvoke.BitwiseAnd(hueFilterYellow, saturationFilterYellow, mergedImageYellow);
+                CvInvoke.BitwiseAnd(mergedImageYellow, valueFilterYellow, mergedImageYellow);
+                Invoke(new Action(() => { hsvPictureBoxMerged.Image = mergedImageYellow.ToBitmap(); }));
 
-                //add hue, sat, and value2 for the redline 
-                Mat hsvFrame2 = new Mat();
-                CvInvoke.CvtColor(originalFrame, hsvFrame2, Emgu.CV.CvEnum.ColorConversion.Bgr2Hsv);
-                Mat[] hsvChannels2 = hsvFrame2.Split();
+                
+
+                //HSV Frame 2 -- for red line picture boxes 
+                Mat hsvFrameRed = new Mat();
+                CvInvoke.CvtColor(originalFrame, hsvFrameRed, Emgu.CV.CvEnum.ColorConversion.Bgr2Hsv);
+                Mat[] hsvChannels2 = hsvFrameRed.Split();
 
                 //hue 2 
-                Mat hueFilter2 = new Mat();
-                CvInvoke.InRange(hsvChannels2[0], new ScalarArray(hueMinRed), new ScalarArray(hueMaxRed), hueFilter2);
-                Invoke(new Action(() => { huePictureBox2.Image = hueFilter2.ToBitmap(); }));
+                Mat hueFilterRed = new Mat();
+                CvInvoke.InRange(hsvChannels2[0], new ScalarArray(hueMinRed), new ScalarArray(hueMaxRed), hueFilterRed);
+                Invoke(new Action(() => { huePictureBox2.Image = hueFilterRed.ToBitmap(); }));
 
                 //sat 2 
-                Mat saturationFilter2 = new Mat();
-                CvInvoke.InRange(hsvChannels2[1], new ScalarArray(satMinRed), new ScalarArray(satMaxRed), saturationFilter2);
-                Invoke(new Action(() => { satPictureBox2.Image = saturationFilter2.ToBitmap(); }));
+                Mat saturationFilterRed = new Mat();
+                CvInvoke.InRange(hsvChannels2[1], new ScalarArray(satMinRed), new ScalarArray(satMaxRed), saturationFilterRed);
+                Invoke(new Action(() => { satPictureBox2.Image = saturationFilterRed.ToBitmap(); }));
 
                 //val 2 
-                Mat valueFilter2 = new Mat();
-                CvInvoke.InRange(hsvChannels2[2], new ScalarArray(valMinRed), new ScalarArray(valMaxRed), valueFilter2);
-                Invoke(new Action(() => { valPictureBox2.Image = valueFilter2.ToBitmap(); }));
+                Mat valueFilterRed = new Mat();
+                CvInvoke.InRange(hsvChannels2[2], new ScalarArray(valMinRed), new ScalarArray(valMaxRed), valueFilterRed);
+                Invoke(new Action(() => { valPictureBox2.Image = valueFilterRed.ToBitmap(); }));
 
-                //merge image 2 
+                //merge image for red line detection 
 
-                Mat mergedImage2 = new Mat();
-                CvInvoke.BitwiseAnd(hueFilter2, saturationFilter2, mergedImage2);
-                CvInvoke.BitwiseAnd(mergedImage2, valueFilter2, mergedImage2);
-                Invoke(new Action(() => { hsvMergedPictureBoxRed.Image = mergedImage2.ToBitmap(); }));
+                Mat mergedImageRed = new Mat();
+                CvInvoke.BitwiseAnd(hueFilterRed, saturationFilterRed, mergedImageRed);
+                CvInvoke.BitwiseAnd(mergedImageRed, valueFilterRed, mergedImageRed);
+                Invoke(new Action(() => { hsvMergedPictureBoxRed.Image = mergedImageRed.ToBitmap(); }));
 
 
-                //resize final images
-                resizeFinal_YellowImage(mergedImage);
-                //resizeFinal_RedImage(mergedImage2);
+                //resize final yellow image 
+                resizeFinal_YellowImage(mergedImageYellow);
+         
 
                 //erode and dialate the image to make things smoother 
+                //dialte increases the pixel sizes and then erosion gets rid of all the extra pixels not needed
+                //makes final image smooth with less random pixels all around 
                 Mat kernal = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new Size(2, 2), new Point(1, 1));
-                CvInvoke.Erode(mergedImage, mergedImage, kernal, new Point(1, 1), 1, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
-                CvInvoke.Dilate(mergedImage, mergedImage, kernal, new Point(1, 1), 1, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
+                CvInvoke.Erode(mergedImageYellow, mergedImageYellow, kernal, new Point(1, 1), 1, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
+                CvInvoke.Dilate(mergedImageYellow, mergedImageYellow, kernal, new Point(1, 1), 1, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
 
                 Mat kernal2 = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new Size(2, 2), new Point(1, 1));
-                CvInvoke.Erode(mergedImage2, mergedImage2, kernal2, new Point(1, 1), 1, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
-                CvInvoke.Dilate(mergedImage2, mergedImage2, kernal2, new Point(1, 1), 1, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
+                CvInvoke.Erode(mergedImageRed, mergedImageRed, kernal2, new Point(1, 1), 1, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
+                CvInvoke.Dilate(mergedImageRed, mergedImageRed, kernal2, new Point(1, 1), 1, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
 
                 //gaussian blur 
-                Mat gaussFrame = mergedImage.Clone();
-                CvInvoke.GaussianBlur(gaussFrame, gaussFrame, new Size(5, 5), 1.5);
+                //this is done to make the image more blurry but also takes out glare
+                //only issue is that the image cannot see as far in front of it so placement matters much more now 
+                Mat gaussFrameYellow = mergedImageYellow.Clone();
+                CvInvoke.GaussianBlur(gaussFrameYellow, gaussFrameYellow, new Size(5, 5), 1.5);
 
-                Mat gaussFrame2 = mergedImage2.Clone();
-                CvInvoke.GaussianBlur(gaussFrame2, gaussFrame2, new Size(5, 5), 1.5);
+                Mat gaussFrameRed = mergedImageRed.Clone();
+                CvInvoke.GaussianBlur(gaussFrameRed, gaussFrameRed, new Size(5, 5), 1.5);
 
 
                 //* -------------------------- Pixel Counts Red and Yellow ----------------------------- *// 
 
-                Image<Gray, byte> image = mergedImage.ToImage<Gray, byte>();
-                Image<Gray, byte> image2 = mergedImage2.ToImage<Gray, Byte>();
+                Image<Gray, byte> image = mergedImageYellow.ToImage<Gray, byte>();
+                Image<Gray, byte> image2 = mergedImageRed.ToImage<Gray, Byte>();
 
                 //yellow 
+                //set up 5 slices for the final image - middle, left and right and far left and right 
+                //this is done to get largest pixel count in whatever slice to turn the robot later on while going down the track 
                 //hard left 
-                for (int x = 0; x < mergedImage.Width / 5; x++)
+                for (int x = 0; x < mergedImageYellow.Width / 5; x++)
                 {
-                    for (int y = 0; y < mergedImage.Height; y++)
+                    for (int y = 0; y < mergedImageYellow.Height; y++)
                     {
                         if (image.Data[y, x, 0] == 255)
                         {
@@ -218,9 +219,9 @@ namespace CSHW4_UR1
                 }
 
                 //soft left 
-                for (int x = (mergedImage.Width / 5); x < (2 * (mergedImage.Width / 5)); x++)
+                for (int x = (mergedImageYellow.Width / 5); x < (2 * (mergedImageYellow.Width / 5)); x++)
                 {
-                    for (int y = 0; y < mergedImage.Height; y++)
+                    for (int y = 0; y < mergedImageYellow.Height; y++)
                     {
                         if (image.Data[y, x, 0] == 255)
                         {
@@ -231,9 +232,9 @@ namespace CSHW4_UR1
                 }
 
                 //middle 
-                for (int x = (2 * (mergedImage.Width / 5)); x < (3 * (mergedImage.Width / 5)); x++)
+                for (int x = (2 * (mergedImageYellow.Width / 5)); x < (3 * (mergedImageYellow.Width / 5)); x++)
                 {
-                    for (int y = 0; y < mergedImage.Height; y++)
+                    for (int y = 0; y < mergedImageYellow.Height; y++)
                     {
                         if (image.Data[y, x, 0] == 255)
                         {
@@ -244,9 +245,9 @@ namespace CSHW4_UR1
                 }
 
                 //soft right 
-                for (int x = (3 * (mergedImage.Width / 5)); x < (4 * (mergedImage.Width / 5)); x++)
+                for (int x = (3 * (mergedImageYellow.Width / 5)); x < (4 * (mergedImageYellow.Width / 5)); x++)
                 {
-                    for (int y = 0; y < mergedImage.Height; y++)
+                    for (int y = 0; y < mergedImageYellow.Height; y++)
                     {
                         if (image.Data[y, x, 0] == 255)
                         {
@@ -257,9 +258,9 @@ namespace CSHW4_UR1
                 }
 
                 //hard right 
-                for (int x = ((mergedImage.Width / 5) * 4); x < ((mergedImage.Width / 5) * 5); x++)
+                for (int x = ((mergedImageYellow.Width / 5) * 4); x < ((mergedImageYellow.Width / 5) * 5); x++)
                 {
-                    for (int y = 0; y < mergedImage.Height; y++)
+                    for (int y = 0; y < mergedImageYellow.Height; y++)
                     {
                         if (image.Data[y, x, 0] == 255)
                         {
@@ -281,11 +282,11 @@ namespace CSHW4_UR1
 
 
 
-                //red
+                //same thing as yellow but with red image instead 
                 //hard left 
-                for (int x = 0; x < mergedImage2.Width / 5; x++)
+                for (int x = 0; x < mergedImageRed.Width / 5; x++)
                 {
-                    for (int y = 0; y < mergedImage2.Height; y++)
+                    for (int y = 0; y < mergedImageRed.Height; y++)
                     {
                         if (image2.Data[y, x, 0] == 255)
                         {
@@ -295,9 +296,9 @@ namespace CSHW4_UR1
                 }
 
                 //soft left 
-                for (int x = (mergedImage2.Width / 5); x < (2 * (mergedImage2.Width / 5)); x++)
+                for (int x = (mergedImageRed.Width / 5); x < (2 * (mergedImageRed.Width / 5)); x++)
                 {
-                    for (int y = 0; y < mergedImage2.Height; y++)
+                    for (int y = 0; y < mergedImageRed.Height; y++)
                     {
                         if (image2.Data[y, x, 0] == 255)
                         {
@@ -308,9 +309,9 @@ namespace CSHW4_UR1
                 }
 
                 //middle 
-                for (int x = (2 * (mergedImage2.Width / 5)); x < (3 * (mergedImage2.Width / 5)); x++)
+                for (int x = (2 * (mergedImageRed.Width / 5)); x < (3 * (mergedImageRed.Width / 5)); x++)
                 {
-                    for (int y = 0; y < mergedImage2.Height; y++)
+                    for (int y = 0; y < mergedImageRed.Height; y++)
                     {
                         if (image2.Data[y, x, 0] == 255)
                         {
@@ -321,9 +322,9 @@ namespace CSHW4_UR1
                 }
 
                 //soft right 
-                for (int x = (3 * (mergedImage2.Width / 5)); x < (4 * (mergedImage2.Width / 5)); x++)
+                for (int x = (3 * (mergedImageRed.Width / 5)); x < (4 * (mergedImageRed.Width / 5)); x++)
                 {
-                    for (int y = 0; y < mergedImage2.Height; y++)
+                    for (int y = 0; y < mergedImageRed.Height; y++)
                     {
                         if (image2.Data[y, x, 0] == 255)
                         {
@@ -334,9 +335,9 @@ namespace CSHW4_UR1
                 }
 
                 //hard right 
-                for (int x = ((mergedImage2.Width / 5) * 4); x < ((mergedImage2.Width / 5) * 5); x++)
+                for (int x = ((mergedImageRed.Width / 5) * 4); x < ((mergedImageRed.Width / 5) * 5); x++)
                 {
-                    for (int y = 0; y < mergedImage2.Height; y++)
+                    for (int y = 0; y < mergedImageRed.Height; y++)
                     {
                         if (image2.Data[y, x, 0] == 255)
                         {
@@ -357,6 +358,10 @@ namespace CSHW4_UR1
 
 
                 //* --------------------------- Serial Communications ----------------------------- *// 
+
+                //this did not work as it was too general and the robot would mess up in corners slighly 
+                //if the pixels were close enough or some glare within the other slices would mess up 
+                //causing the robot to go a different way than intended or switch states too late and go outside the white lines
 
                 //yellow line
                 /*
@@ -404,28 +409,33 @@ namespace CSHW4_UR1
 
                 //array to get largest slice 
                 //need to have array and then find largest slice in that array from the pixel count
-                //this is done so that the serial buffer tube does not get overran with data bytes, and then make sure the switch statement can only be one case at a time 
-                //set serialCharcommand to the index of the largest slice, then take that and output it with robot.move command 
+                //this is done so that the serial buffer tube does not get overran with data bytes
+                //and then make sure the switch statement can only be one case at a time 
+                //set serialCharcommand to the index of the largest slice
+                //then take that and output it with robot.move command 
+                //this is much better than my method before with the if statements
+                //since it was more detailed in finding the largest slice 
+
                 int[] largestSliceArray = { yellowPixelsMiddle, yellowPixelsLeft, yellowPixelsRight, yellowPixelsHardLeft, yellowPixelsHardRight, redPixelsMiddle };
                 int largestSlice_ofArray = largestSliceArray[0];
-                int serialCharacterCommand = 0; 
+                int serialCharacterCommand = 0; //index of the array later on that represents the cases and what slice 
 
-                for (int i = 0; i < largestSliceArray.Length; i++)
+                for (int i = 0; i < largestSliceArray.Length; i++) //get the array index total length 
                 {
                     if (largestSliceArray[i] > largestSlice_ofArray)
                     {
                         largestSlice_ofArray = largestSliceArray[i];
-                        serialCharacterCommand = i;
+                        serialCharacterCommand = i; //set serial command as the index within the array 
                     }
                 }
 
-                if (start)
+                if (start) //if statement with bool wrapped around switch statement so that the start/stop button works 
                 {
                     switch (serialCharacterCommand)
                     {
                         case 0:
                             robot.Move('f');
-                            serialChar = 'f';
+                            serialChar = 'f'; //serial char is used to outputting onto the UI for debugging purposes 
                             break;
                         case 1:
                             robot.Move('l');
@@ -450,7 +460,7 @@ namespace CSHW4_UR1
                     }
                 }
                
-
+                //outputting the serial char onto the user interface for debugging 
                 Invoke(new Action(() =>
                 {
                     serial_output_char_label.Text = $"{serialChar}";
@@ -494,12 +504,13 @@ namespace CSHW4_UR1
             valMaxRed_Label.Text = $"{valMaxRed}";
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        //start and stop button for easier control when setting up the robot 
+        //simply allows the program to go into the switch statements if start button is pressed 
+        private void start_button_Click(object sender, EventArgs e)
         {
             start = true;
         }
-
-        private void button2_Click(object sender, EventArgs e)
+        private void stop_button_Click(object sender, EventArgs e)
         {
             start = false;
         }

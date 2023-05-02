@@ -90,8 +90,8 @@
             this.label15 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.start_button = new System.Windows.Forms.Button();
+            this.stop_button = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.originalPictureBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.hsvPictureBoxMerged)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.huePictureBox)).BeginInit();
@@ -678,33 +678,33 @@
             this.label17.TabIndex = 66;
             this.label17.Text = "s = stop";
             // 
-            // button1
+            // start_button
             // 
-            this.button1.Location = new System.Drawing.Point(153, 600);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(102, 52);
-            this.button1.TabIndex = 67;
-            this.button1.Text = "Start ";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.start_button.Location = new System.Drawing.Point(164, 600);
+            this.start_button.Name = "start_button";
+            this.start_button.Size = new System.Drawing.Size(97, 58);
+            this.start_button.TabIndex = 67;
+            this.start_button.Text = "Start";
+            this.start_button.UseVisualStyleBackColor = true;
+            this.start_button.Click += new System.EventHandler(this.start_button_Click);
             // 
-            // button2
+            // stop_button
             // 
-            this.button2.Location = new System.Drawing.Point(153, 678);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(100, 55);
-            this.button2.TabIndex = 68;
-            this.button2.Text = "Stop";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.stop_button.Location = new System.Drawing.Point(164, 682);
+            this.stop_button.Name = "stop_button";
+            this.stop_button.Size = new System.Drawing.Size(97, 55);
+            this.stop_button.TabIndex = 68;
+            this.stop_button.Text = "Stop";
+            this.stop_button.UseVisualStyleBackColor = true;
+            this.stop_button.Click += new System.EventHandler(this.stop_button_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1120, 763);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.stop_button);
+            this.Controls.Add(this.start_button);
             this.Controls.Add(this.label17);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.label15);
@@ -862,8 +862,8 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button start_button;
+        private System.Windows.Forms.Button stop_button;
     }
 }
 
