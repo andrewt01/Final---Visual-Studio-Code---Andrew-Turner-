@@ -34,7 +34,7 @@ namespace CSHW4_UR1
         int hueMax = 179;
         int saturationMax, valueMax = 255;
 
-        //red line 
+        //red line max and min values, same as yellow but now red line 
         int hueMinRed, satMinRed, valMinRed = 0;
         int hueMaxRed = 179;
         int satMaxRed, valMaxRed = 255;
@@ -42,11 +42,13 @@ namespace CSHW4_UR1
         //bool value for start and stop button later 
         bool start = false;
 
+        //setup 
         public Form1()
         {
             InitializeComponent();
         }
 
+        //more setup 
         private void Form1_Load(object sender, EventArgs e)
         {
             _capture = new VideoCapture(0); //0 is onboard camera, 1 is offboard camera 
@@ -95,6 +97,7 @@ namespace CSHW4_UR1
                 int redPixelsHardLeft = 0;
                 int redPixelsHardRight = 0;
 
+                //serial char for output later on onto the UI, default is s for stop 
                 char serialChar = 's';
 
                 //test
@@ -112,6 +115,9 @@ namespace CSHW4_UR1
                 resizePictureBox(originalFrame);
 
                 //binary threshold portion for binaryPictureBox
+                //set new frame, and convert that from blue,green,red values to gray 
+                //then threshold it to type binary 
+                //set new picture box to final binary type 
                 Mat grayFrame = new Mat();
                 CvInvoke.CvtColor(originalFrame, grayFrame, Emgu.CV.CvEnum.ColorConversion.Bgr2Gray);
                 CvInvoke.Threshold(grayFrame, grayFrame, _threshold, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
@@ -119,6 +125,7 @@ namespace CSHW4_UR1
 
                 
                 //HSV Threshold 1 -- yellow line 
+                //converting this new hue frame from bgr, to hue sat val ranges 
                 Mat hsvFrameYellow = new Mat();
                 CvInvoke.CvtColor(originalFrame, hsvFrameYellow, Emgu.CV.CvEnum.ColorConversion.Bgr2Hsv);
                 Mat[] hsvChannels = hsvFrameYellow.Split();
@@ -138,6 +145,9 @@ namespace CSHW4_UR1
                 CvInvoke.InRange(hsvChannels[2], new ScalarArray(valueMin), new ScalarArray(valueMax), valueFilterYellow);
                 Invoke(new Action(() => { valuePictureBox.Image = valueFilterYellow.ToBitmap(); }));
 
+                //merge all the images into one final image for output onto the screen
+                //takes all the values from hue sat and val and combines them into one output
+                //example would be the yellow line, each frame combines into the final yellow line 
                 Mat mergedImageYellow = new Mat();
                 CvInvoke.BitwiseAnd(hueFilterYellow, saturationFilterYellow, mergedImageYellow);
                 CvInvoke.BitwiseAnd(mergedImageYellow, valueFilterYellow, mergedImageYellow);
@@ -166,7 +176,7 @@ namespace CSHW4_UR1
                 Invoke(new Action(() => { valPictureBox2.Image = valueFilterRed.ToBitmap(); }));
 
                 //merge image for red line detection 
-
+                //same as yellow but for red now 
                 Mat mergedImageRed = new Mat();
                 CvInvoke.BitwiseAnd(hueFilterRed, saturationFilterRed, mergedImageRed);
                 CvInvoke.BitwiseAnd(mergedImageRed, valueFilterRed, mergedImageRed);
@@ -174,6 +184,7 @@ namespace CSHW4_UR1
 
 
                 //resize final yellow image 
+                //for a bigger final image to see the line easier 
                 resizeFinal_YellowImage(mergedImageYellow);
          
 
@@ -206,19 +217,21 @@ namespace CSHW4_UR1
                 //yellow 
                 //set up 5 slices for the final image - middle, left and right and far left and right 
                 //this is done to get largest pixel count in whatever slice to turn the robot later on while going down the track 
+                //divide by 5 in this since I am using 5 slices
                 //hard left 
-                for (int x = 0; x < mergedImageYellow.Width / 5; x++)
+                for (int x = 0; x < mergedImageYellow.Width / 5; x++) //get width and divide by 5 (5 slices)
                 {
-                    for (int y = 0; y < mergedImageYellow.Height; y++)
+                    for (int y = 0; y < mergedImageYellow.Height; y++) // get height
                     {
-                        if (image.Data[y, x, 0] == 255)
+                        if (image.Data[y, x, 0] == 255) 
                         {
-                            yellowPixelsHardLeft++;
+                            yellowPixelsHardLeft++; //add one iteration to the yellowPixelsHardLeft count for later on
                         }
                     }
                 }
 
                 //soft left 
+                //times by two (because 2nd slice from left to right) on width then multiply by 5 
                 for (int x = (mergedImageYellow.Width / 5); x < (2 * (mergedImageYellow.Width / 5)); x++)
                 {
                     for (int y = 0; y < mergedImageYellow.Height; y++)
@@ -232,6 +245,7 @@ namespace CSHW4_UR1
                 }
 
                 //middle 
+                //times by three since its the middle slice 
                 for (int x = (2 * (mergedImageYellow.Width / 5)); x < (3 * (mergedImageYellow.Width / 5)); x++)
                 {
                     for (int y = 0; y < mergedImageYellow.Height; y++)
@@ -245,6 +259,7 @@ namespace CSHW4_UR1
                 }
 
                 //soft right 
+                //times by 4 since its the soft right slice, fourth in the line 
                 for (int x = (3 * (mergedImageYellow.Width / 5)); x < (4 * (mergedImageYellow.Width / 5)); x++)
                 {
                     for (int y = 0; y < mergedImageYellow.Height; y++)
@@ -258,6 +273,7 @@ namespace CSHW4_UR1
                 }
 
                 //hard right 
+                //times by 5 for furthest right slice in the sequence 
                 for (int x = ((mergedImageYellow.Width / 5) * 4); x < ((mergedImageYellow.Width / 5) * 5); x++)
                 {
                     for (int y = 0; y < mergedImageYellow.Height; y++)
@@ -270,6 +286,7 @@ namespace CSHW4_UR1
                     }
                 }
 
+                //this outputs the value of the pixels in each slice to the UI 
                 Invoke(new Action(() =>
                 {
                     yPixHLeft.Text = $"{yellowPixelsHardLeft}";
@@ -410,12 +427,14 @@ namespace CSHW4_UR1
                 //array to get largest slice 
                 //need to have array and then find largest slice in that array from the pixel count
                 //this is done so that the serial buffer tube does not get overran with data bytes
+                //plus it is easier for the computer to get the data and then send a serial character based on that at a later time  
                 //and then make sure the switch statement can only be one case at a time 
                 //set serialCharcommand to the index of the largest slice
                 //then take that and output it with robot.move command 
                 //this is much better than my method before with the if statements
                 //since it was more detailed in finding the largest slice 
 
+                //largestSliceArray is all the slices from above put into an array 
                 int[] largestSliceArray = { yellowPixelsMiddle, yellowPixelsLeft, yellowPixelsRight, yellowPixelsHardLeft, yellowPixelsHardRight, redPixelsMiddle };
                 int largestSlice_ofArray = largestSliceArray[0];
                 int serialCharacterCommand = 0; //index of the array later on that represents the cases and what slice 
